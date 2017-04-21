@@ -28,4 +28,5 @@ def test_gaussian_emission_forwards_backwards():
     ])
 
     # then
-    assert (result == expected).all()
+    assert (result[0] == expected).all()
+    assert ((result[1] == 0) + (result[1] == 1)).all()

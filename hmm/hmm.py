@@ -1,11 +1,15 @@
 import numpy as np
 import scipy.stats as st
+from operator import add
+from itertools import product
 from scipy.misc import logsumexp
 
 
 def gaussian_emission_forwards_backwards(signal, means, variances,
                                          transition_probs, starting_dist):
     """
+    This implementation follows Murphy, p. 612.
+
     params:
     ------
     signal: an iterable of observed values
@@ -20,6 +24,8 @@ def gaussian_emission_forwards_backwards(signal, means, variances,
     ------
     gamma: a matrix where the value at row t column j is the probability of
         being in state j in timestep t
+    xi: 3D array where the value at xi[t, i, j] is the joint probability of
+        state i at timestep t and state j at timestep t + 1
     """
     num_motifs = len(means)
     num_positions = len(signal)
@@ -44,9 +50,17 @@ def gaussian_emission_forwards_backwards(signal, means, variances,
     for t in range(num_positions - 2, -1, -1):
         beta[t] = logsumexp(log_tp + (beta[t + 1] + probs[t + 1]), axis=1)
 
-    # normalize
+    # compute and normalize gamma
     gamma = alpha + beta
     for t in range(num_positions):
         gamma[t] = gamma[t] - logsumexp(gamma[t])
 
-    return np.exp(gamma)
+    # compute and normalize xi
+    xi = np.zeros((num_positions - 1, num_motifs, num_motifs))
+    for t in range(num_positions - 1):
+        xi[t] = log_tp + np.array([
+            add(*p) for p in product(alpha[t], probs[t + 1] + beta[t + 1])
+        ]).reshape(num_motifs, num_motifs)
+        xi[t] = xi[t] - logsumexp(xi[t])
+
+    return np.exp(gamma), np.exp(xi)
