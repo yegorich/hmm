@@ -64,4 +64,4 @@ def gaussian_emission_forwards_backwards(signal, means, variances,
         ]).reshape(num_motifs, num_motifs)
         xi[t] = xi[t] - logsumexp(xi[t])
 
-    return np.exp(gamma), np.exp(xi)
+    return np.exp(gamma), np.exp(xi), logsumexp(alpha[num_positions - 1])
