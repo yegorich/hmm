@@ -4,7 +4,7 @@ from scipy.misc import logsumexp
 
 
 def gaussian_emission_forwards_backwards(signal, means, variances,
-                                         transition_probs):
+                                         transition_probs, starting_dist):
     """
     params:
     ------
@@ -13,6 +13,8 @@ def gaussian_emission_forwards_backwards(signal, means, variances,
     variances: an iterable of the variances for each state
     transition_probs: a matrix where the value at row j column i is the
         probability of transitioning from state j to state i
+    starting_dist: an iterable of the probabilities of starting at each
+        state
 
     returns:
     ------
@@ -33,7 +35,7 @@ def gaussian_emission_forwards_backwards(signal, means, variances,
 
     # forwards
     alpha = np.ones((num_positions, num_motifs))
-    alpha[0] = probs[0] + log_tp[0]
+    alpha[0] = probs[0] + starting_dist
     for t in range(1, num_positions):
         alpha[t] = probs[t] + logsumexp(log_tp.T + alpha[t - 1], axis=1)
 
