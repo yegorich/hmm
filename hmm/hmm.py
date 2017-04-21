@@ -41,7 +41,7 @@ def gaussian_emission_forwards_backwards(signal, means, variances,
 
     # forwards
     alpha = np.ones((num_positions, num_motifs))
-    alpha[0] = probs[0] + starting_dist
+    alpha[0] = probs[0] + np.log(starting_dist)
     for t in range(1, num_positions):
         alpha[t] = probs[t] + logsumexp(log_tp.T + alpha[t - 1], axis=1)
 
