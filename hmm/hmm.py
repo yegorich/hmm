@@ -32,6 +32,7 @@ def gaussian_emission_forwards_backwards(signal, means, variances,
 
     # suppress warning for 0 valued transition probabilities
     with np.errstate(divide='ignore'):
+        log_start = np.log(starting_dist)
         log_tp = np.log(transition_probs)
 
     # probability of each timestep under each distribution
@@ -41,7 +42,7 @@ def gaussian_emission_forwards_backwards(signal, means, variances,
 
     # forwards
     alpha = np.ones((num_positions, num_motifs))
-    alpha[0] = probs[0] + np.log(starting_dist)
+    alpha[0] = probs[0] + log_start
     for t in range(1, num_positions):
         alpha[t] = probs[t] + logsumexp(log_tp.T + alpha[t - 1], axis=1)
 
