@@ -26,6 +26,7 @@ def gaussian_emission_forwards_backwards(signal, means, variances,
         being in state j in timestep t
     xi: 3D array where the value at xi[t, i, j] is the joint probability of
         state i at timestep t and state j at timestep t + 1
+    observed_log_likelihood: the observed data log likelihood
     """
     num_motifs = len(means)
     num_positions = len(signal)
@@ -64,4 +65,5 @@ def gaussian_emission_forwards_backwards(signal, means, variances,
         ]).reshape(num_motifs, num_motifs)
         xi[t] = xi[t] - logsumexp(xi[t])
 
-    return np.exp(gamma), np.exp(xi), logsumexp(alpha[num_positions - 1])
+    observed_log_likelihood = logsumexp(alpha[num_positions - 1])
+    return np.exp(gamma), np.exp(xi), observed_log_likelihood
